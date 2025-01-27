@@ -26,7 +26,12 @@
 		"cmake.configureOnOpen": true,
 		"files.associations": {
 			"glob.h": "c",
-			"lvgl.h": "c"
+			"lvgl.h": "c",
+			"lv_anim.h": "c",
+			"lv_demos.h": "c",
+			"random": "c",
+			"cstring": "c",
+			"typeinfo": "c"
 		},
 	},
 	// tasks.json section
