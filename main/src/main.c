@@ -76,23 +76,6 @@ static void main_speedometer(void)
     lv_obj_align(scale, LV_ALIGN_CENTER, 0, 0);
     speedo_needle_img(scale);
 
-
-
-    // /* speedometer needle animation */
-    // lv_anim_t anim_scale_img;
-    // lv_anim_init(&anim_scale_img);
-    // lv_anim_set_var(&anim_scale_img, scale);
-    // lv_anim_set_exec_cb(&anim_scale_img, set_needle_img_value);
-    // lv_anim_set_path_cb(&anim_scale_img, lv_anim_path_ease_in_out);
-    // lv_anim_set_playback_time(&anim_scale_img, 3000);
-    // lv_anim_set_playback_delay(&anim_scale_img, 1000);
-
-    // lv_anim_set_path_cb(&anim_scale_img, lv_anim_path_ease_in_out);
-
-    // lv_anim_set_duration(&anim_scale_img, 3000);
-    // lv_anim_set_repeat_count(&anim_scale_img, LV_ANIM_REPEAT_INFINITE);
-    // lv_anim_set_values(&anim_scale_img, 00, 100);
-    // lv_anim_start(&anim_scale_img);
 }
 
 
@@ -119,42 +102,90 @@ static void button_event_handler(lv_event_t * e)
     }
 }
 
-void toggle_button(void)
+/******************
+ * Motor Temperature Bar
+******************/
+
+void func_motor_temp_bar(void)
 {
-    lv_obj_t * label;
+    static lv_style_t motor_temp_style_indic;
 
-    lv_obj_t * btn2 = lv_btn_create(lv_screen_active());
-    lv_obj_add_event_cb(btn2, button_event_handler, LV_EVENT_ALL, NULL);
-    lv_obj_align(btn2, LV_ALIGN_TOP_MID, 350, 80);
-    lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_set_height(btn2, LV_SIZE_CONTENT);
+    lv_style_init(&motor_temp_style_indic);
+    lv_style_set_bg_opa(&motor_temp_style_indic, LV_OPA_COVER);
+    lv_style_set_bg_color(&motor_temp_style_indic, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_bg_grad_color(&motor_temp_style_indic, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_bg_grad_dir(&motor_temp_style_indic, LV_GRAD_DIR_VER);
 
-    label = lv_label_create(btn2);
-    lv_label_set_text(label, "Start"); // Initially set the label to "Start"
-    lv_obj_center(label);
+    lv_obj_t * motor_temp_bar = lv_bar_create(lv_screen_active());
+    lv_obj_add_style(motor_temp_bar, &motor_temp_style_indic, LV_PART_INDICATOR);
+    lv_obj_set_size(motor_temp_bar, 40, 400);
+    lv_obj_align(motor_temp_bar, LV_ALIGN_LEFT_MID, 80, 0);
+    lv_bar_set_range(motor_temp_bar, -20, 40);
 
-    /*Init the pressed style*/
-    static lv_style_t style_pr;
-    lv_style_init(&style_pr);
+}
 
-    /*Add a large outline when pressed*/
-    lv_style_set_outline_width(&style_pr, 30);
-    lv_style_set_outline_opa(&style_pr, LV_OPA_TRANSP);
+/******************
+ * Regen brake Bar
+******************/
 
-    lv_style_set_translate_y(&style_pr, 5);
-    lv_style_set_shadow_offset_y(&style_pr, 3);
-    lv_style_set_bg_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 2));
-    lv_style_set_bg_grad_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 4));
+void func_regen_brake_bar(void)
+{
+    static lv_style_t regen_brake_style_indic;
 
-    /*Add a transition to the outline*/
-    static lv_style_transition_dsc_t trans;
-    static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_OPA, 0};
-    lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear, 300, 0, NULL);
+    lv_style_init(&regen_brake_style_indic);
+    lv_style_set_bg_opa(&regen_brake_style_indic, LV_OPA_COVER);
+    lv_style_set_bg_color(&regen_brake_style_indic, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_bg_grad_color(&regen_brake_style_indic, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_bg_grad_dir(&regen_brake_style_indic, LV_GRAD_DIR_VER);
 
-    lv_style_set_transition(&style_pr, &trans);
-    lv_obj_add_style(btn2, &style_pr, LV_STATE_PRESSED);
-    lv_obj_set_size(btn2, 200, 100);
+    lv_obj_t * regen_brake = lv_bar_create(lv_screen_active());
+    lv_obj_add_style(regen_brake, &regen_brake_style_indic, LV_PART_INDICATOR);
+    lv_obj_set_size(regen_brake, 40, 400);
+    lv_obj_align(regen_brake, LV_ALIGN_RIGHT_MID, -80, 0);
+    lv_bar_set_range(regen_brake, -20, 40);
 
+}
+
+
+/******************
+Start/Stop Button
+******************/
+
+void create_start_stop_button(void)
+{
+    lv_obj_t *button_label;
+
+    lv_obj_t *start_stop_button = lv_btn_create(lv_screen_active());
+    lv_obj_add_event_cb(start_stop_button, button_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_align(start_stop_button, LV_ALIGN_TOP_MID, 350, 80);
+    lv_obj_add_flag(start_stop_button, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_set_height(start_stop_button, LV_SIZE_CONTENT);
+
+    button_label = lv_label_create(start_stop_button);
+    lv_label_set_text(button_label, "Start"); // Initially set the label to "Start"
+    lv_obj_center(button_label);
+
+    /* Initialize the pressed state style */
+    static lv_style_t pressed_style;
+    lv_style_init(&pressed_style);
+
+    /* Add a large outline when pressed */
+    lv_style_set_outline_width(&pressed_style, 30);
+    lv_style_set_outline_opa(&pressed_style, LV_OPA_TRANSP);
+
+    lv_style_set_translate_y(&pressed_style, 5);
+    lv_style_set_shadow_offset_y(&pressed_style, 3);
+    lv_style_set_bg_color(&pressed_style, lv_palette_darken(LV_PALETTE_BLUE, 2));
+    lv_style_set_bg_grad_color(&pressed_style, lv_palette_darken(LV_PALETTE_BLUE, 4));
+
+    /* Add a transition to the outline */
+    static lv_style_transition_dsc_t outline_transition;
+    static lv_style_prop_t transition_properties[] = {LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_OPA, 0};
+    lv_style_transition_dsc_init(&outline_transition, transition_properties, lv_anim_path_linear, 300, 0, NULL);
+
+    lv_style_set_transition(&pressed_style, &outline_transition);
+    lv_obj_add_style(start_stop_button, &pressed_style, LV_STATE_PRESSED);
+    lv_obj_set_size(start_stop_button, 200, 100);
 }
 
 /******************
@@ -166,11 +197,11 @@ static void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
     lv_led_set_bright(led, bright);
 }
 
-void status_led(void)
+void func_status_led(void)
 {
-    lv_obj_t * label;
-    lv_obj_t * led1 = lv_led_create(lv_screen_active());
-    lv_obj_remove_style_all(led1);
+    lv_obj_t * status_led_label;
+    lv_obj_t * status_led = lv_led_create(lv_screen_active());
+    lv_obj_remove_style_all(status_led);
 
     static lv_style_t style_warning;
     lv_style_init(&style_warning);
@@ -179,14 +210,83 @@ void status_led(void)
     lv_style_set_border_width(&style_warning, 2);
     lv_style_set_text_color(&style_warning, lv_palette_darken(LV_PALETTE_YELLOW, 4));
     lv_style_set_radius(&style_warning, 10);
-    lv_obj_add_style(led1, &style_warning, 0);
-    lv_obj_align(led1, LV_ALIGN_TOP_MID, -350, 80);
-    lv_obj_set_size(led1, 200, 100);
-    lv_led_on(led1);
+    lv_obj_add_style(status_led, &style_warning, 0);
+    lv_obj_align(status_led, LV_ALIGN_TOP_MID, -350, 80);
+    lv_obj_set_size(status_led, 200, 100);
+    lv_led_on(status_led);
 
-    label = lv_label_create(led1);
-    lv_label_set_text(label, "Warning");
-    lv_obj_center(label);
+    status_led_label = lv_label_create(status_led);
+    lv_label_set_text(status_led_label, "Warning");
+    lv_obj_center(status_led_label);
+
+}
+
+
+/******************
+ * Menu Button/Window
+******************/
+
+static void event_cb(lv_event_t * e)
+{
+    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * label = lv_obj_get_child(btn, 0);
+    LV_UNUSED(label);
+    LV_LOG_USER("Button %s clicked", lv_label_get_text(label));
+    // if it is close button, return the orginal window
+    if(strcmp(lv_label_get_text(label), LV_SYMBOL_CLOSE) == 0) {
+        lv_obj_t * win = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_obj_del(win);
+    }
+}
+
+static void menu_event_handler(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if(code == LV_EVENT_CLICKED) {
+        LV_LOG_USER("Clicked");
+        // // Create a new window
+        // lv_obj_t * mbox1 = lv_msgbox_create(NULL);
+
+        // lv_msgbox_add_title(mbox1, "Menu");
+
+        // lv_msgbox_add_close_button(mbox1);
+
+        // lv_obj_t * btn;
+        // btn = lv_msgbox_add_footer_button(mbox1, "Settings");
+        // lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+        // btn = lv_msgbox_add_footer_button(mbox1, "About");
+        // lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+        // return;
+
+    lv_obj_t * win = lv_win_create(lv_screen_active());
+    lv_obj_t * btn;
+
+    lv_win_add_title(win, "Menu");
+
+    btn = lv_win_add_button(win, LV_SYMBOL_CLOSE, 60);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+
+    lv_obj_t * cont = lv_win_get_content(win);  /*Content can be added here*/
+
+    }
+    else if(code == LV_EVENT_VALUE_CHANGED) {
+        LV_LOG_USER("Toggled");
+    }
+}
+
+void func_menu_button(void)
+{
+    lv_obj_t * menu_label;
+
+    lv_obj_t * menu_button = lv_button_create(lv_screen_active());
+    lv_obj_add_event_cb(menu_button, menu_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_align(menu_button, LV_ALIGN_TOP_RIGHT, -20, 20);
+    lv_obj_remove_flag(menu_button, LV_OBJ_FLAG_PRESS_LOCK);
+
+    menu_label = lv_label_create(menu_button);
+    lv_label_set_text(menu_label, "Menu");
+    lv_obj_center(menu_label);
 
 }
 
@@ -207,8 +307,11 @@ int main(int argc, char **argv)
   #if LV_USE_OS == LV_OS_NONE
 
   main_speedometer();
-  toggle_button();
-  status_led();
+  create_start_stop_button();
+  func_status_led();
+  func_motor_temp_bar();
+  func_regen_brake_bar();
+  func_menu_button();
   while(1) {
     /* Periodically call the lv_task handler.
      * It could be done in a timer interrupt or an OS task too.*/
